@@ -2,11 +2,22 @@
 export interface AssetMetadata {
   name: string;
   symbol: string;
-  asset_type: string;
+  asset_type: 'game_project' | 'in_game_assets' | 'beta_access';
   description: string;
-  valuation: string; // i128 as string to handle large numbers
-  last_valuation_date: number; // u64 timestamp
+  valuation: string;
+  last_valuation_date: number;
   legal_doc_hash: string;
+  game_details?: GameDetails;
+}
+
+export interface GameDetails {
+  genre: string;
+  platform: string;
+  engine: string;
+  development_stage: 'concept' | 'pre-alpha' | 'alpha' | 'beta' | 'launch';
+  features: string[];
+  team_size: number;
+  estimated_launch_date: number;
 }
 
 export interface ComplianceData {
@@ -265,4 +276,4 @@ export interface FinancialsFormData {
   managementFee: string;
   distributionFrequency: 'monthly' | 'quarterly' | 'annually';
   estimatedAppreciation: string;
-} 
+}

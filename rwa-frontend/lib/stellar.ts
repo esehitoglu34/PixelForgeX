@@ -1,4 +1,4 @@
-import { Networks, Keypair } from '@stellar/stellar-sdk';
+import { Networks, Keypair, Contract, SorobanRpc, Transaction, xdr } from '@stellar/stellar-sdk';
 import { NetworkConfig } from './types';
 
 // Network configurations
@@ -27,8 +27,7 @@ export const RWA_CONTRACT_ID = 'CBQAAC4EHNMMHEI2W3QU6UQ5N4KSVYRLVTB5M2XMARCNS4CN
 
 // Create Soroban RPC server instance
 export const createSorobanServer = (network: 'testnet' | 'mainnet' = DEFAULT_NETWORK) => {
-  // Return the URL for now - will implement proper RPC client later
-  return NETWORKS[network].sorobanUrl;
+  return new SorobanRpc.Server(NETWORKS[network].sorobanUrl, { allowHttp: true });
 };
 
 // Format token amounts for display (contract uses 7 decimal places)
@@ -254,4 +253,103 @@ export const parseContractError = (error: any): string => {
   }
   
   return 'Unknown error occurred';
-}; 
+};
+
+export const TESTNET_RPC_URL = 'https://soroban-testnet.stellar.org';
+export const TESTNET_PASSPHRASE = 'Test SDF Network ; September 2015';
+
+// Network configuration
+export const getNetworkConfig = () => ({
+  networkPassphrase: TESTNET_PASSPHRASE,
+  rpcUrl: TESTNET_RPC_URL,
+});
+
+// Deploy contract to testnet
+export const deployContract = async (
+  sourceSecretKey: string,
+  wasmB64: string,
+): Promise<string> => {
+  const server = new SorobanRpc.Server(TESTNET_RPC_URL);
+  const networkConfig = getNetworkConfig();
+
+  // Create a new account from the secret key
+  const sourceKeypair = Keypair.fromSecret(sourceSecretKey);
+  const sourcePublicKey = sourceKeypair.publicKey();
+
+  // Prepare the contract deployment
+  const contract = new Contract();
+  
+  try {
+    // Deploy the contract
+    const transaction = new Transaction({
+      sourceAccount: sourcePublicKey,
+      networkPassphrase: networkConfig.networkPassphrase,
+    });
+
+    // Add the deploy contract operation
+    transaction.addOperation(contract.deploy({
+      source: sourcePublicKey,
+      wasmB64,
+    }));
+
+    // Sign and submit the transaction
+    transaction.sign(sourceKeypair);
+    const response = await server.sendTransaction(transaction);
+
+    // Wait for confirmation
+    const result = await server.waitForTransactionResponse(response.hash);
+
+    if (result.status === 'SUCCESS') {
+      return result.contractId;
+    } else {
+      throw new Error(`Contract deployment failed: ${result.status}`);
+    }
+  } catch (error) {
+    console.error('Error deploying contract:', error);
+    throw error;
+  }
+};
+
+// Initialize the deployed contract
+export const initializeContract = async (
+  contractId: string,
+  sourceSecretKey: string,
+  admin: string,
+  assetMetadata: AssetMetadata,
+  initialSupply: string,
+): Promise<void> => {
+  const server = new SorobanRpc.Server(TESTNET_RPC_URL);
+  const networkConfig = getNetworkConfig();
+  const sourceKeypair = Keypair.fromSecret(sourceSecretKey);
+
+  try {
+    // Create initialization transaction
+    const contract = new Contract(contractId);
+    const transaction = new Transaction({
+      sourceAccount: sourceKeypair.publicKey(),
+      networkPassphrase: networkConfig.networkPassphrase,
+    });
+
+    // Add initialize function call
+    transaction.addOperation(contract.call(
+      'initialize',
+      admin,
+      assetMetadata,
+      initialSupply,
+    ));
+
+    // Sign and submit
+    transaction.sign(sourceKeypair);
+    const response = await server.sendTransaction(transaction);
+    
+    // Wait for confirmation
+    const result = await server.waitForTransactionResponse(response.hash);
+    
+    if (result.status !== 'SUCCESS') {
+      throw new Error(`Contract initialization failed: ${result.status}`);
+    }
+  } catch (error) {
+    console.error('Error initializing contract:', error);
+    throw error;
+  }
+};

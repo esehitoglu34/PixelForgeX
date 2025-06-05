@@ -29,93 +29,100 @@ import {
 import { formatCurrency } from '@/lib/stellar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 const ASSET_TYPES = [
   {
-    id: 'real_estate',
-    name: 'Real Estate',
-    description: 'Residential, commercial, or industrial properties',
+    id: 'game_project',
+    name: 'Game Project',
+    description: 'Full game development projects',
     icon: Building2,
-    minValue: 100000,
-    examples: ['Apartment buildings', 'Office complexes', 'Warehouses', 'Retail spaces']
-  },
-  {
-    id: 'commodities',
-    name: 'Commodities',
-    description: 'Physical goods and precious metals',
-    icon: Coins,
     minValue: 50000,
-    examples: ['Gold storage', 'Oil reserves', 'Agricultural products', 'Rare metals']
+    examples: ['RPG Games', 'Strategy Games', 'Action Games', 'Mobile Games']
   },
   {
-    id: 'infrastructure',
-    name: 'Infrastructure',
-    description: 'Energy, transportation, and utility projects',
-    icon: Briefcase,
-    minValue: 500000,
-    examples: ['Solar farms', 'Wind turbines', 'Data centers', 'Transportation hubs']
+    id: 'in_game_assets',
+    name: 'In-Game Assets',
+    description: 'Unique items, characters, and collectibles',
+    icon: Coins,
+    minValue: 1000,
+    examples: ['Character Skins', 'Rare Items', 'Special Equipment', 'Collectible Sets']
+  },
+  {
+    id: 'beta_access',
+    name: 'Beta Access',
+    description: 'Early access rights and testing privileges',
+    icon: Shield,
+    minValue: 5000,
+    examples: ['Alpha Testing', 'Beta Testing', 'Early Access', 'Development Updates']
   }
 ];
 
 const TOKENIZATION_STEPS = [
   {
-    id: 1,
-    title: 'Asset Details',
-    description: 'Provide basic information about your asset'
+    id: 'project_info',
+    title: 'Game Details',
+    description: 'Enter basic information about your game project',
+    icon: FileText,
+    bgColor: 'from-primary/10 to-primary/5'
   },
   {
-    id: 2,
-    title: 'Legal Documentation',
-    description: 'Upload required legal and ownership documents'
+    id: 'technical_specs',
+    title: 'Technical Specs',
+    description: 'Provide technical details and game mechanics',
+    icon: Calculator,
+    bgColor: 'from-secondary/10 to-secondary/5'
   },
   {
-    id: 3,
-    title: 'Tokenization Structure',
-    description: 'Define token economics and distribution'
+    id: 'licensing',
+    title: 'Licensing',
+    description: 'Set up IP rights and usage terms',
+    icon: Shield,
+    bgColor: 'from-primary/10 to-secondary/10'
   },
   {
-    id: 4,
-    title: 'Compliance Setup',
-    description: 'Configure investor requirements and restrictions'
+    id: 'tokenomics',
+    title: 'Game Economics',
+    description: 'Define token distribution and pricing',
+    icon: Coins,
+    bgColor: 'from-secondary/10 to-primary/10'
   },
   {
-    id: 5,
-    title: 'Review & Deploy',
-    description: 'Review all details and deploy your token'
+    id: 'launch',
+    title: 'Launch Project',
+    description: 'Review and deploy your game project',
+    icon: Upload,
+    bgColor: 'from-accent/10 to-accent/5'
   }
 ];
+
+interface FormData {
+  assetType: string;
+  assetName: string;
+  description: string;
+  gameEngine?: string;
+  platform?: string;
+  genre?: string;
+  playerCount?: string;
+  features?: string;
+  licenseType?: string;
+  ipRights?: string;
+  termsOfUse?: string;
+  tokenSupply?: number;
+  tokenPrice?: number;
+  fundingGoal?: number;
+  vestingPeriod?: number;
+  distribution?: string;
+  termsAccepted?: boolean;
+}
 
 export default function TokenizePage() {
   const { isConnected, address } = useWalletStore();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    // Step 1: Asset Details
+  const [formData, setFormData] = useState<FormData>({
     assetType: '',
     assetName: '',
-    location: '',
-    description: '',
-    totalValue: '',
-    
-    // Step 2: Legal Documentation
-    ownershipProof: null as File | null,
-    valuation: null as File | null,
-    insurance: null as File | null,
-    
-    // Step 3: Tokenization Structure
-    tokenSymbol: '',
-    totalSupply: '',
-    pricePerToken: '',
-    minInvestment: '',
-    
-    // Step 4: Compliance
-    kycRequired: true,
-    accreditedOnly: false,
-    jurisdictionRestrictions: '',
-    
-    // Step 5: Launch settings
-    launchDate: '',
-    fundingGoal: '',
-    fundingDeadline: ''
+    description: ''
   });
 
   const updateFormData = (field: string, value: any) => {
@@ -153,77 +160,60 @@ export default function TokenizePage() {
       case 1:
         return (
           <div className="space-y-6">
-            <div>
-              <Label className="text-base font-semibold mb-4 block">Asset Type</Label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {ASSET_TYPES.map((type) => {
-                  const Icon = type.icon;
-                  return (
-                    <Card 
-                      key={type.id}
-                      className={`cursor-pointer transition-all ${
-                        formData.assetType === type.id 
-                          ? 'ring-2 ring-primary bg-primary/5' 
-                          : 'hover:shadow-md'
-                      }`}
-                      onClick={() => updateFormData('assetType', type.id)}
-                    >
-                      <CardContent className="p-6 text-center">
-                        <Icon className="h-8 w-8 mx-auto mb-3 text-primary" />
-                        <h3 className="font-semibold mb-2">{type.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-3">{type.description}</p>
-                        <Badge variant="outline">Min: {formatCurrency(type.minValue.toString())}</Badge>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="assetName">Asset Name</Label>
+              {ASSET_TYPES.map((type) => (
+                <div
+                  key={type.id}
+                  className={cn(
+                    "gaming-card p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02]",
+                    formData.assetType === type.id && "ring-2 ring-primary"
+                  )}
+                  onClick={() => setFormData({ ...formData, assetType: type.id })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                    setFormData({ ...formData, assetName: e.target.value })}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 p-2">
+                      <type.icon className="w-full h-full text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="gaming-title text-sm font-medium">{type.name}</h4>
+                      <p className="text-xs text-muted-foreground">{type.description}</p>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {type.examples.map((example) => (
+                          <Badge key={example} variant="secondary" className="text-xs">
+                            {example}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="gameName">Game Name</Label>
                 <Input
-                  id="assetName"
-                  placeholder="e.g., Luxury Apartment NYC"
+                  id="gameName"
+                  placeholder="Enter your game's name"
                   value={formData.assetName}
-                  onChange={(e) => updateFormData('assetName', e.target.value)}
+                  onChange={(e) => setFormData({ ...formData, assetName: e.target.value })}
+                  className="gaming-input"
                 />
               </div>
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="e.g., Manhattan, New York"
-                  value={formData.location}
-                  onChange={(e) => updateFormData('location', e.target.value)}
+
+              <div className="space-y-2">
+                <Label htmlFor="gameDescription">Game Description</Label>
+                <Textarea
+                  id="gameDescription"
+                  placeholder="Describe your game and its unique features"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="gaming-input min-h-[100px]"
                 />
               </div>
-            </div>
-
-            <div>
-              <Label htmlFor="description">Asset Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Detailed description of your asset, its features, and investment potential..."
-                value={formData.description}
-                onChange={(e) => updateFormData('description', e.target.value)}
-                className="min-h-24"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="totalValue">Total Asset Value (USD)</Label>
-              <Input
-                id="totalValue"
-                type="number"
-                placeholder="2500000"
-                value={formData.totalValue}
-                onChange={(e) => updateFormData('totalValue', e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Based on professional appraisal or market valuation
-              </p>
             </div>
           </div>
         );
@@ -231,97 +221,51 @@ export default function TokenizePage() {
       case 2:
         return (
           <div className="space-y-6">
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                All documents must be notarized and verified by our legal team before tokenization approval.
-              </AlertDescription>
-            </Alert>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Ownership Proof
-                  </CardTitle>
-                  <CardDescription>
-                    Property deed, title, or ownership certificate
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">Upload PDF or image</p>
-                    <Button variant="outline" size="sm">
-                      Choose File
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-2">
+                <Label htmlFor="gameEngine">Game Engine</Label>
+                <Input
+                  id="gameEngine"
+                  placeholder="e.g., Unreal Engine, Unity"
+                  className="gaming-input"
+                />
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calculator className="h-5 w-5" />
-                    Professional Valuation
-                  </CardTitle>
-                  <CardDescription>
-                    Official appraisal from certified assessor
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">Upload appraisal report</p>
-                    <Button variant="outline" size="sm">
-                      Choose File
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-2">
+                <Label htmlFor="platform">Target Platform</Label>
+                <Input
+                  id="platform"
+                  placeholder="e.g., PC, Mobile, Console"
+                  className="gaming-input"
+                />
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5" />
-                    Insurance Documentation
-                  </CardTitle>
-                  <CardDescription>
-                    Current insurance policy and coverage details
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">Upload insurance policy</p>
-                    <Button variant="outline" size="sm">
-                      Choose File
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-2">
+                <Label htmlFor="genre">Game Genre</Label>
+                <Input
+                  id="genre"
+                  placeholder="e.g., RPG, Strategy, Action"
+                  className="gaming-input"
+                />
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5" />
-                    Additional Documents
-                  </CardTitle>
-                  <CardDescription>
-                    Any other relevant legal or financial documents
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">Optional documents</p>
-                    <Button variant="outline" size="sm">
-                      Choose Files
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-2">
+                <Label htmlFor="playerCount">Player Count</Label>
+                <Input
+                  id="playerCount"
+                  placeholder="e.g., Single-player, 2-4 players"
+                  className="gaming-input"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="features">Key Features</Label>
+              <Textarea
+                id="features"
+                placeholder="List the main features and mechanics of your game"
+                className="gaming-input min-h-[100px]"
+              />
             </div>
           </div>
         );
@@ -330,88 +274,38 @@ export default function TokenizePage() {
         const tokenomics = calculateTokenomics();
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="tokenSymbol">Token Symbol</Label>
+            <Alert className="gaming-alert">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Make sure you have the rights to all assets and content in your game.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="licenseType">License Type</Label>
                 <Input
-                  id="tokenSymbol"
-                  placeholder="e.g., LAPT"
-                  value={formData.tokenSymbol}
-                  onChange={(e) => updateFormData('tokenSymbol', e.target.value.toUpperCase())}
-                  maxLength={5}
-                />
-                <p className="text-sm text-muted-foreground mt-1">
-                  3-5 character unique identifier
-                </p>
-              </div>
-              <div>
-                <Label htmlFor="totalSupply">Total Token Supply</Label>
-                <Input
-                  id="totalSupply"
-                  type="number"
-                  placeholder="1000000"
-                  value={formData.totalSupply}
-                  onChange={(e) => updateFormData('totalSupply', e.target.value)}
+                  id="licenseType"
+                  placeholder="e.g., Proprietary, Open Source"
+                  className="gaming-input"
                 />
               </div>
-            </div>
 
-            <div>
-              <Label htmlFor="minInvestment">Minimum Investment (USD)</Label>
-              <Input
-                id="minInvestment"
-                type="number"
-                placeholder="250"
-                value={formData.minInvestment}
-                onChange={(e) => updateFormData('minInvestment', e.target.value)}
-              />
-            </div>
-
-            {tokenomics && (
-              <Card className="bg-muted/50">
-                <CardHeader>
-                  <CardTitle>Calculated Tokenomics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Price Per Token</p>
-                      <p className="text-2xl font-bold">${tokenomics.pricePerToken}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Market Cap</p>
-                      <p className="text-2xl font-bold">{formatCurrency(tokenomics.marketCap.toString())}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Min Investment Tokens</p>
-                      <p className="text-2xl font-bold">{tokenomics.minInvestmentTokens.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="fundingGoal">Funding Goal (USD)</Label>
-                <Input
-                  id="fundingGoal"
-                  type="number"
-                  placeholder="1000000"
-                  value={formData.fundingGoal}
-                  onChange={(e) => updateFormData('fundingGoal', e.target.value)}
+              <div className="space-y-2">
+                <Label htmlFor="ipRights">IP Rights</Label>
+                <Textarea
+                  id="ipRights"
+                  placeholder="Describe the intellectual property rights and ownership structure"
+                  className="gaming-input min-h-[100px]"
                 />
-                <p className="text-sm text-muted-foreground mt-1">
-                  Target amount to raise from investors
-                </p>
               </div>
-              <div>
-                <Label htmlFor="fundingDeadline">Funding Deadline</Label>
-                <Input
-                  id="fundingDeadline"
-                  type="date"
-                  value={formData.fundingDeadline}
-                  onChange={(e) => updateFormData('fundingDeadline', e.target.value)}
+
+              <div className="space-y-2">
+                <Label htmlFor="termsOfUse">Terms of Use</Label>
+                <Textarea
+                  id="termsOfUse"
+                  placeholder="Define how token holders can use their assets"
+                  className="gaming-input min-h-[100px]"
                 />
               </div>
             </div>
@@ -421,133 +315,99 @@ export default function TokenizePage() {
       case 4:
         return (
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Investor Requirements</CardTitle>
-                <CardDescription>
-                  Set compliance requirements for token holders
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>KYC Verification Required</Label>
-                    <p className="text-sm text-muted-foreground">All investors must complete identity verification</p>
-                  </div>
-                  <Button
-                    variant={formData.kycRequired ? "default" : "outline"}
-                    onClick={() => updateFormData('kycRequired', !formData.kycRequired)}
-                  >
-                    {formData.kycRequired ? 'Required' : 'Optional'}
-                  </Button>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="tokenSupply">Total Token Supply</Label>
+                <Input
+                  id="tokenSupply"
+                  type="number"
+                  placeholder="e.g., 1000000"
+                  className="gaming-input"
+                />
+              </div>
 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Accredited Investors Only</Label>
-                    <p className="text-sm text-muted-foreground">Restrict to accredited investors (higher income/net worth)</p>
-                  </div>
-                  <Button
-                    variant={formData.accreditedOnly ? "default" : "outline"}
-                    onClick={() => updateFormData('accreditedOnly', !formData.accreditedOnly)}
-                  >
-                    {formData.accreditedOnly ? 'Required' : 'Open to All'}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+              <div className="space-y-2">
+                <Label htmlFor="tokenPrice">Token Price (USDC)</Label>
+                <Input
+                  id="tokenPrice"
+                  type="number"
+                  placeholder="e.g., 1.00"
+                  className="gaming-input"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="jurisdictionRestrictions">Jurisdiction Restrictions</Label>
-              <Textarea
-                id="jurisdictionRestrictions"
-                placeholder="e.g., US residents only, excluding OFAC sanctioned countries..."
-                value={formData.jurisdictionRestrictions}
-                onChange={(e) => updateFormData('jurisdictionRestrictions', e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Specify any geographic restrictions for token holders
-              </p>
+              <div className="space-y-2">
+                <Label htmlFor="fundingGoal">Funding Goal (USDC)</Label>
+                <Input
+                  id="fundingGoal"
+                  type="number"
+                  placeholder="e.g., 100000"
+                  className="gaming-input"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="vestingPeriod">Vesting Period (months)</Label>
+                <Input
+                  id="vestingPeriod"
+                  type="number"
+                  placeholder="e.g., 12"
+                  className="gaming-input"
+                />
+              </div>
             </div>
 
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Our legal team will review these settings to ensure regulatory compliance in relevant jurisdictions.
-              </AlertDescription>
-            </Alert>
+            <div className="space-y-2">
+              <Label htmlFor="distribution">Token Distribution</Label>
+              <Textarea
+                id="distribution"
+                placeholder="Describe how tokens will be distributed (e.g., Team: 20%, Community: 30%, etc.)"
+                className="gaming-input min-h-[100px]"
+              />
+            </div>
           </div>
         );
 
       case 5:
         return (
           <div className="space-y-6">
-            <Alert>
-              <Check className="h-4 w-4" />
+            <Alert className="gaming-alert">
+              <Info className="h-4 w-4" />
               <AlertDescription>
-                Review all information carefully. Once deployed, some settings cannot be changed.
+                Review all information carefully before launching your game project.
               </AlertDescription>
             </Alert>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
+            <div className="space-y-4">
+              <Card className="gaming-card bg-primary/5">
                 <CardHeader>
-                  <CardTitle>Asset Information</CardTitle>
+                  <CardTitle className="text-lg">Game Project Summary</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Name:</span>
-                    <span className="font-medium">{formData.assetName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Type:</span>
-                    <span className="font-medium">{ASSET_TYPES.find(t => t.id === formData.assetType)?.name}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Location:</span>
-                    <span className="font-medium">{formData.location}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total Value:</span>
-                    <span className="font-medium">{formatCurrency(formData.totalValue)}</span>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Game Name</p>
+                      <p className="font-medium">{formData.assetName}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Project Type</p>
+                      <p className="font-medium capitalize">{formData.assetType.replace('_', ' ')}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-sm text-muted-foreground">Description</p>
+                      <p className="font-medium">{formData.description}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Token Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Symbol:</span>
-                    <span className="font-medium">{formData.tokenSymbol}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total Supply:</span>
-                    <span className="font-medium">{parseFloat(formData.totalSupply).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Price per Token:</span>
-                    <span className="font-medium">${calculateTokenomics()?.pricePerToken}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Min Investment:</span>
-                    <span className="font-medium">{formatCurrency(formData.minInvestment)}</span>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="terms" className="gaming-checkbox" />
+                <Label htmlFor="terms" className="text-sm">
+                  I confirm that all information provided is accurate and I have the rights to tokenize this game project
+                </Label>
+              </div>
             </div>
-
-            <Card className="bg-primary text-primary-foreground">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-2">Deployment Cost</h3>
-                <div className="text-3xl font-bold mb-2">$2,500 USD</div>
-                <p className="text-sm opacity-90">
-                  Includes smart contract deployment, legal review, compliance setup, and ongoing platform fees for the first year.
-                </p>
-              </CardContent>
-            </Card>
           </div>
         );
 
@@ -577,81 +437,127 @@ export default function TokenizePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold">Asset Tokenization</h1>
-            <p className="text-xl text-muted-foreground">
-              Transform your real world asset into tradeable tokens
+        <div className="space-y-8">
+          {/* Page Title */}
+          <div className="gaming-container space-y-4">
+            <h1 className="gaming-title text-4xl md:text-5xl text-center bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent">
+              Launch Your Game Project
+            </h1>
+            <p className="text-lg text-muted-foreground text-center max-w-2xl mx-auto">
+              Tokenize your game, secure funding, and build your community through blockchain technology
             </p>
           </div>
 
-          {/* Progress Steps */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                {TOKENIZATION_STEPS.map((step, index) => (
-                  <div key={step.id} className="flex items-center">
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
-                      currentStep >= step.id 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {currentStep > step.id ? <Check className="h-4 w-4" /> : step.id}
-                    </div>
-                    {index < TOKENIZATION_STEPS.length - 1 && (
-                      <div className={`w-16 h-0.5 mx-2 ${
-                        currentStep > step.id ? 'bg-primary' : 'bg-muted'
-                      }`} />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <Progress value={(currentStep / TOKENIZATION_STEPS.length) * 100} className="mb-2" />
-              <div className="text-center">
-                <h3 className="font-semibold">{TOKENIZATION_STEPS[currentStep - 1].title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {TOKENIZATION_STEPS[currentStep - 1].description}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Progress Bar */}
+          <div className="w-full max-w-3xl mx-auto space-y-2">
+            <Progress 
+              value={(currentStep / TOKENIZATION_STEPS.length) * 100} 
+              className="h-2 gaming-progress"
+            />
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Step {currentStep} of {TOKENIZATION_STEPS.length}</span>
+              <span>{TOKENIZATION_STEPS[currentStep - 1].title}</span>
+            </div>
+          </div>
 
-          {/* Step Content */}
-          <Card>
-            <CardContent className="p-8">
+          {/* Step Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
+            {TOKENIZATION_STEPS.map((step, index) => {
+              const stepNumber = index + 1;
+              const isActive = currentStep === stepNumber;
+              const isCompleted = currentStep > stepNumber;
+
+              return (
+                <div
+                  key={step.id}
+                  className={cn(
+                    "gaming-card relative group transition-all duration-300",
+                    isActive && "scale-105 ring-2 ring-primary",
+                    isCompleted && "opacity-50"
+                  )}
+                >
+                  <div className={cn(
+                    "absolute inset-0 bg-gradient-to-br opacity-20 rounded-lg",
+                    step.bgColor
+                  )} />
+                  
+                  <div className="relative p-4 text-center">
+                    <div className="w-10 h-10 mx-auto rounded-xl bg-primary/10 p-2 mb-3 transition-transform group-hover:scale-110">
+                      {isCompleted ? (
+                        <Check className="w-full h-full text-green-500" />
+                      ) : (
+                        <step.icon className="w-full h-full text-primary" />
+                      )}
+                    </div>
+                    <h3 className="gaming-title text-sm font-medium mb-1">{step.title}</h3>
+                    <p className="text-xs text-muted-foreground">{step.description}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Form Section */}
+          <Card className="gaming-card max-w-3xl mx-auto">
+            <CardHeader>
+              <CardTitle className="gaming-title text-2xl">
+                {TOKENIZATION_STEPS[currentStep - 1].title}
+              </CardTitle>
+              <CardDescription>
+                {TOKENIZATION_STEPS[currentStep - 1].description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
               {renderStepContent()}
             </CardContent>
           </Card>
 
-          {/* Navigation */}
-          <div className="flex justify-between">
-            <Button 
-              variant="outline" 
-              onClick={prevStep}
+          {/* Navigation Buttons */}
+          <div className="flex justify-between max-w-3xl mx-auto pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
               disabled={currentStep === 1}
+              className="gaming-button variant-outline"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Previous
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Previous Step
             </Button>
             
-            {currentStep < TOKENIZATION_STEPS.length ? (
-              <Button onClick={nextStep}>
-                Next
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            ) : (
-              <Button className="bg-green-600 hover:bg-green-700">
-                Deploy Token
-                <Coins className="h-4 w-4 ml-2" />
-              </Button>
-            )}
+            <Button
+              onClick={() => setCurrentStep(Math.min(TOKENIZATION_STEPS.length, currentStep + 1))}
+              disabled={currentStep === TOKENIZATION_STEPS.length}
+              className="gaming-button"
+            >
+              {currentStep === TOKENIZATION_STEPS.length ? (
+                <>
+                  Launch Project
+                  <Upload className="w-4 h-4 ml-2" />
+                </>
+              ) : (
+                <>
+                  Next Step
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </main>
     </div>
   );
-} 
+}
+
+function getStepName(step: number) {
+  switch (step) {
+    case 1: return 'Project Type';
+    case 2: return 'Basic Info';
+    case 3: return 'Details';
+    case 4: return 'Tokenomics';
+    case 5: return 'Review';
+    default: return '';
+  }
+}

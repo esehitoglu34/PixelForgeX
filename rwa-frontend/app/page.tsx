@@ -21,7 +21,7 @@ import { formatTokenAmount, formatCurrency, formatPercentage } from '@/lib/stell
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const { isConnected, address, checkConnection } = useWalletStore();
+  const { isConnected, address, checkConnection, connect } = useWalletStore();
   const { 
     assetMetadata, 
     userBalance, 
@@ -47,56 +47,76 @@ export default function Dashboard() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
         <Header />
         <main className="container mx-auto px-4 py-8">
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] space-y-8">
             <div className="text-center space-y-4 max-w-2xl">
-              <h1 className="text-4xl font-bold tracking-tight">
-                Real World Asset Investment Platform
+              <h1 className="gaming-title text-4xl md:text-5xl">
+                PixelForgeX Gaming Asset Platform
               </h1>
               <p className="text-xl text-muted-foreground">
-                Access tokenized real estate, commodities, and other physical assets 
-                through compliant blockchain technology on Stellar.
+                Invest in game projects, own in-game assets, and get early access to upcoming games 
+                through blockchain technology on Stellar.
               </p>
+              <Button 
+                onClick={connect}
+                size="lg" 
+                className="gaming-button mt-4"
+              >
+                Connect Wallet to Start
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl">
-              <Card className="text-center">
-                <CardHeader>
-                  <Building2 className="h-12 w-12 mx-auto text-primary" />
-                  <CardTitle className="text-lg">Tokenized Assets</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Invest in premium real estate and other assets through blockchain tokens
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="text-center">
-                <CardHeader>
-                  <CheckCircle className="h-12 w-12 mx-auto text-green-600" />
-                  <CardTitle className="text-lg">Compliant</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    KYC verification and regulatory compliance built into every transaction
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="text-center">
-                <CardHeader>
-                  <TrendingUp className="h-12 w-12 mx-auto text-blue-600" />
-                  <CardTitle className="text-lg">High Yield</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Earn passive income through rental yields and asset appreciation
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mt-12">
+              <Link href="/marketplace" className="w-full">
+                <div className="gaming-card h-full group">
+                  <CardHeader className="text-center space-y-2">
+                    <div className="w-12 h-12 mx-auto rounded-xl bg-primary/10 p-2.5 transition-transform group-hover:scale-110">
+                      <Building2 className="w-full h-full text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="gaming-title">Game Projects</CardTitle>
+                      <CardDescription>
+                        Invest in upcoming games and earn from their success
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                </div>
+              </Link>
+
+              <Link href="/marketplace" className="w-full">
+                <div className="gaming-card h-full group">
+                  <CardHeader className="text-center space-y-2">
+                    <div className="w-12 h-12 mx-auto rounded-xl bg-primary/10 p-2.5 transition-transform group-hover:scale-110">
+                      <CheckCircle className="w-full h-full text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="gaming-title">Beta Access</CardTitle>
+                      <CardDescription>
+                        Get exclusive early access to games and special in-game items
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                </div>
+              </Link>
+
+              <Link href="/marketplace" className="w-full">
+                <div className="gaming-card h-full group">
+                  <CardHeader className="text-center space-y-2">
+                    <div className="w-12 h-12 mx-auto rounded-xl bg-primary/10 p-2.5 transition-transform group-hover:scale-110">
+                      <TrendingUp className="w-full h-full text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="gaming-title">Invest & Earn</CardTitle>
+                      <CardDescription>
+                        Trade gaming assets and earn from their growth
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                </div>
+              </Link>
             </div>
           </div>
         </main>
@@ -105,30 +125,30 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           {/* Welcome Section */}
-          <div className="space-y-4">
-            <h1 className="text-3xl font-bold">Welcome to RWA Investor</h1>
+          <div className="gaming-container space-y-4 text-center md:text-left">
+            <h1 className="gaming-title text-3xl">Welcome to PixelForgeX</h1>
             <p className="text-lg text-muted-foreground">
-              Your gateway to tokenized real world assets
+              Your blockchain-powered gaming asset platform
             </p>
           </div>
 
           {/* Portfolio Overview Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
+            <Card className="gaming-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Your Holdings</CardTitle>
-                <Building2 className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium gaming-title">Portfolio Value</CardTitle>
+                <Building2 className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {formatTokenAmount(userBalance)} LAPT
+                  {formatTokenAmount(userBalance)} PFX
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   ≈ {formatCurrency(
                     (parseFloat(formatTokenAmount(userBalance)) * 1000).toString()
                   )}
@@ -136,47 +156,47 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="gaming-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Compliance Status</CardTitle>
+                <CardTitle className="text-sm font-medium gaming-title">Account Status</CardTitle>
                 {isWhitelisted ? (
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <CheckCircle className="h-4 w-4 text-green-500" />
                 ) : (
-                  <AlertCircle className="h-4 w-4 text-yellow-600" />
+                  <AlertCircle className="h-4 w-4 text-yellow-500" />
                 )}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {isWhitelisted ? 'Verified' : 'Pending'}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {compliance?.kyc_verified ? 'KYC Complete' : 'KYC Required'}
+                <p className="text-sm text-muted-foreground">
+                  {compliance?.kyc_verified ? 'Identity Verified' : 'Verification Required'}
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="gaming-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Est. Annual Yield</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium gaming-title">Projected Returns</CardTitle>
+                <TrendingUp className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">8.5%</div>
-                <p className="text-xs text-muted-foreground">
-                  Rental income + appreciation
+                <div className="text-2xl font-bold">15.5%</div>
+                <p className="text-sm text-muted-foreground">
+                  Annual growth rate
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="gaming-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Next Distribution</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium gaming-title">Active Games</CardTitle>
+                <Clock className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">15 days</div>
-                <p className="text-xs text-muted-foreground">
-                  Monthly rental payment
+                <div className="text-2xl font-bold">3</div>
+                <p className="text-sm text-muted-foreground">
+                  Games with active assets
                 </p>
               </CardContent>
             </Card>

@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RWA Investor - Real World Asset Platform",
-  description: "Access tokenized real estate, commodities, and other physical assets through compliant blockchain technology on Stellar.",
+  title: "PixelForgeX - Gaming Asset Tokenization Platform",
+  description: "Invest in game projects, own in-game assets, and get early access to upcoming games through blockchain technology on Stellar.",
+  icons: {
+    icon: '/gaming-favicon.ico'
+  }
 };
 
 export default function RootLayout({

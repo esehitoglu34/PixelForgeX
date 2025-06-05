@@ -91,132 +91,110 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
-        {/* Logo and Navigation */}
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-3">
-            <Building2 className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-lg font-bold">RWA Investor</h1>
-              <p className="text-xs text-muted-foreground">Real World Assets</p>
-            </div>
+    <header className="sticky top-0 z-50 w-full border-b border-primary/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2 group">
+            <Building2 className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
+            <span className="hidden md:inline-block text-lg font-bold gaming-title">
+              PixelForgeX
+            </span>
           </Link>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex space-x-4">
             <Link 
               href="/dashboard" 
-              className="text-sm font-medium transition-colors hover:text-primary"
+              className="gaming-button variant-ghost px-3 py-2 text-sm hover:text-primary transition-colors"
             >
               Dashboard
             </Link>
             <Link 
               href="/marketplace" 
-              className="text-sm font-medium transition-colors hover:text-primary"
+              className="gaming-button variant-ghost px-3 py-2 text-sm hover:text-primary transition-colors"
             >
               Marketplace
             </Link>
             <Link 
               href="/tokenize" 
-              className="text-sm font-medium transition-colors hover:text-primary"
+              className="gaming-button variant-ghost px-3 py-2 text-sm hover:text-primary transition-colors"
             >
               Tokenize
-            </Link>
-            <Link 
-              href="/transfer" 
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              Transfer
             </Link>
           </nav>
         </div>
 
-        {/* Wallet Section */}
-        <div className="flex items-center gap-3">
-          {/* Network Selector */}
-          {isConnected && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Network className="h-4 w-4" />
-                  <Badge variant={network === 'testnet' ? 'secondary' : 'default'}>
-                    {network}
-                  </Badge>
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem 
-                  onClick={() => handleNetworkSwitch('testnet')}
-                  className={network === 'testnet' ? 'bg-muted' : ''}
-                >
-                  <Network className="h-4 w-4 mr-2" />
-                  Testnet
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => handleNetworkSwitch('mainnet')}
-                  className={network === 'mainnet' ? 'bg-muted' : ''}
-                >
-                  <Network className="h-4 w-4 mr-2" />
-                  Mainnet
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Wallet Connection */}
+        <div className="flex items-center gap-4">
           {isConnected ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2 max-w-48">
-                  <Wallet className="h-4 w-4" />
-                  <div className="text-left">
-                    <div className="font-mono text-sm">
+            <>
+              <Badge 
+                variant={network === 'mainnet' ? 'default' : 'secondary'}
+                className="gaming-badge capitalize hover-glow"
+              >
+                {network}
+              </Badge>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="gaming-button variant-outline"
+                  >
+                    <Wallet className="w-4 h-4" />
+                    <span className="hidden md:inline-block">
                       {truncateAddress(address || '')}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {parseFloat(balance).toFixed(2)} XLM
-                    </div>
-                  </div>
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="px-2 py-1.5">
-                  <div className="text-sm font-medium">Connected Wallet</div>
-                  <div className="font-mono text-xs text-muted-foreground break-all">
-                    {address}
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={copyAddress}>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy Address
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={openInExplorer}>
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View in Explorer
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleDisconnect} className="text-red-600">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Disconnect
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="gaming-container w-56 animate-in fade-in-0 zoom-in-95"
+                >
+                  <DropdownMenuItem onClick={copyAddress}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Address
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={openInExplorer}>
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    View in Explorer
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleNetworkSwitch('mainnet')}
+                  >
+                    <Network className="mr-2 h-4 w-4" />
+                    Switch to Mainnet
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleNetworkSwitch('testnet')}
+                  >
+                    <Network className="mr-2 h-4 w-4" />
+                    Switch to Testnet
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleDisconnect}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Disconnect
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
-            <Button 
-              onClick={handleConnect} 
+            <Button
+              onClick={handleConnect}
               disabled={isLoading}
-              className="gap-2"
+              className="gaming-button"
             >
-              <Wallet className="h-4 w-4" />
-              {isLoading ? 'Connecting...' : 'Connect Wallet'}
+              <Wallet className="mr-2 h-4 w-4" />
+              Connect Wallet
             </Button>
           )}
         </div>
       </div>
     </header>
   );
-} 
+}

@@ -104,242 +104,84 @@ export default function TransferPage() {
     }
   };
 
-  if (!isConnected) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] space-y-6">
-            <Card className="w-full max-w-md text-center">
-              <CardHeader>
-                <Wallet className="h-16 w-16 mx-auto text-muted-foreground" />
-                <CardTitle>Connect Your Wallet</CardTitle>
-                <CardDescription>
-                  You need to connect your Freighter wallet to transfer RWA tokens
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={connect} className="w-full">
-                  Connect Freighter Wallet
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto space-y-6">
-          {/* Page Header */}
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold">Transfer RWA Tokens</h1>
-            <p className="text-muted-foreground">
-              Send your tokenized real world asset shares to other verified investors
+        <div className="max-w-2xl mx-auto space-y-8">
+          <div>
+            <h1 className="text-3xl font-bold">Asset Transfer</h1>
+            <p className="text-muted-foreground mt-2">
+              Transfer your game assets, project tokens, or beta access rights to other players
             </p>
           </div>
 
-          {/* Compliance Status */}
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              <div className="flex items-center justify-between">
-                <span>
-                  Your compliance status: {' '}
-                  <Badge variant={isWhitelisted ? 'default' : 'destructive'}>
-                    {isWhitelisted ? 'Verified' : 'Not Verified'}
-                  </Badge>
-                </span>
-                {compliance?.kyc_verified && (
-                  <Badge variant="outline" className="text-xs">
-                    KYC Complete
-                  </Badge>
-                )}
-              </div>
-            </AlertDescription>
-          </Alert>
-
-          {/* Current Holdings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Holdings</CardTitle>
-              <CardDescription>Available RWA tokens for transfer</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold">{formatTokenAmount(userBalance)} LAPT</p>
-                  <p className="text-sm text-muted-foreground">Luxury Apartment NYC tokens</p>
+          {!isConnected ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Connect Wallet</CardTitle>
+                <CardDescription>
+                  Connect your wallet to transfer gaming assets
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={connect}>
+                  <Wallet className="w-4 h-4 mr-2" />
+                  Connect Wallet
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Transfer Details</CardTitle>
+                <CardDescription>
+                  Enter the recipient's Player ID and the amount to transfer
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Player ID (Recipient)</Label>
+                  <Input
+                    placeholder="Enter recipient's Player ID"
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value)}
+                  />
                 </div>
-                <Badge variant="secondary">Real Estate</Badge>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Transfer Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Send className="h-5 w-5" />
-                Transfer Tokens
-              </CardTitle>
-              <CardDescription>
-                Enter the recipient address and amount to transfer
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Recipient Address */}
-              <div className="space-y-2">
-                <Label htmlFor="recipient">Recipient Address</Label>
-                <Input
-                  id="recipient"
-                  placeholder="G... (Stellar address)"
-                  value={recipient}
-                  onChange={(e) => setRecipient(e.target.value)}
-                  className={`font-mono ${
-                    recipient && !isValidRecipient ? 'border-red-500' : ''
-                  }`}
-                />
-                {recipient && !isValidRecipient && (
-                  <p className="text-sm text-red-600">Invalid Stellar address format</p>
-                )}
-                {isValidRecipient && recipientCompliance && (
-                  <div className="flex items-center gap-2 text-sm text-green-600">
-                    <CheckCircle className="h-4 w-4" />
-                    Recipient is verified and whitelisted
-                  </div>
-                )}
-              </div>
-
-              {/* Amount */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="amount">Amount (LAPT)</Label>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={handleMaxAmount}
-                    className="text-xs"
-                  >
-                    Max: {formatTokenAmount(userBalance)}
-                  </Button>
+                <div className="space-y-2">
+                  <Label>Transfer Amount</Label>
+                  <Input
+                    type="number"
+                    placeholder="Amount of tokens to transfer"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Available Balance: {formatTokenAmount(userBalance)} tokens
+                  </p>
                 </div>
-                <Input
-                  id="amount"
-                  type="number"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  min="0"
-                  step="0.01"
-                />
-                {amount && parseFloat(amount) > parseFloat(formatTokenAmount(userBalance)) && (
-                  <p className="text-sm text-red-600">Insufficient balance</p>
-                )}
-              </div>
 
-              {/* Transaction Details */}
-              {amount && isValidRecipient && (
-                <div className="space-y-3 p-4 bg-muted rounded-lg">
-                  <h4 className="font-medium">Transaction Summary</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Amount:</span>
-                      <span className="font-mono">{amount} LAPT</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Estimated Network Fee:</span>
-                      <span className="font-mono">{estimateNetworkFee('transfer')} XLM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>To:</span>
-                      <span className="font-mono text-xs">
-                        {recipient.slice(0, 8)}...{recipient.slice(-8)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Transfer Button */}
-              <Button 
-                onClick={handleTransfer}
-                disabled={!canTransfer() || isLoading}
-                className="w-full"
-                size="lg"
-              >
-                {isLoading ? (
-                  'Processing Transfer...'
-                ) : (
-                  <>
-                    Transfer Tokens
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </>
-                )}
-              </Button>
-
-              {/* Warnings */}
-              {!isWhitelisted && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
+                <Alert>
+                  <Info className="w-4 h-4" />
                   <AlertDescription>
-                    Your address is not whitelisted. You cannot transfer tokens until compliance verification is complete.
+                    Transfers are final and cannot be reversed. Make sure the recipient's Player ID is correct.
                   </AlertDescription>
                 </Alert>
-              )}
-            </CardContent>
-          </Card>
 
-          {/* Help Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Transfer Requirements</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                <div>
-                  <p className="font-medium">KYC Verification</p>
-                  <p className="text-sm text-muted-foreground">
-                    Both sender and recipient must have completed KYC verification
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                <div>
-                  <p className="font-medium">Whitelist Status</p>
-                  <p className="text-sm text-muted-foreground">
-                    Addresses must be on the approved whitelist for this asset
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                <div>
-                  <p className="font-medium">Jurisdiction Compliance</p>
-                  <p className="text-sm text-muted-foreground">
-                    Transfers must comply with local regulations and asset restrictions
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Back to Dashboard */}
-          <div className="text-center">
-            <Button variant="outline" asChild>
-              <Link href="/">
-                ← Back to Dashboard
-              </Link>
-            </Button>
-          </div>
+                <Button 
+                  className="w-full" 
+                  onClick={() => setShowConfirmation(true)}
+                  disabled={!isValidRecipient || !amount || isLoading}
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Transfer Assets
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
     </div>
   );
-} 
+}
