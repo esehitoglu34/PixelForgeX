@@ -28,8 +28,8 @@ PixelForgeX revolutionizes game development funding and digital asset ownership 
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pdr-platform.git
-cd pdr-platform
+git clone https://github.com/esehitoglu34/PixelForgeX.git
+cd PixelForgeX
 
 # Install dependencies
 npm install
@@ -49,6 +49,9 @@ STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
 # Testnet Account (Demo Only)
 PUBLIC_KEY=GDQWI24F4XPCBGI2UOUBQTQIFWMNKQOBLCLG2QGYLP4LQNEKBLJKW7TL
 # Add your secret key to .env.local file
+
+# Contract ID
+CONTRACT_ID=CDSXFNELJKRGZASPLK3DEKVHAZSA3XIGPY7UPB26CVPS5LIQYL766QY3
 ```
 
 ### Mainnet Deployment
